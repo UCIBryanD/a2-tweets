@@ -2,6 +2,7 @@ class Tweet {
 	private text:string;
 	time:Date;
 
+
 	constructor(tweet_text:string, tweet_time:string) {
         this.text = tweet_text;
 		this.time = new Date(tweet_time);//, "ddd MMM D HH:mm:ss Z YYYY"
@@ -10,12 +11,21 @@ class Tweet {
 	//returns either 'live_event', 'achievement', 'completed_event', or 'miscellaneous'
     get source():string {
         //TODO: identify whether the source is a live event, an achievement, a completed event, or miscellaneous.
-        return "unknown";
+        
+        var msg_type:string = "miscellaneous";
+
+        if (this.text.startsWith("Just completed") || this.text.startsWith("Just posted")) {msg_type = "completed_event";}
+        else if (this.text.startsWith("Watch my")) {msg_type = "live_event";}
+        else if (this.text.startsWith("Achieved a")) {msg_type = "achievement";}
+
+        return msg_type;
     }
 
     //returns a boolean, whether the text includes any content written by the person tweeting.
     get written():boolean {
         //TODO: identify whether the tweet is written
+
+        
         return false;
     }
 
