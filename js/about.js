@@ -15,6 +15,7 @@ function parseTweets(runkeeper_tweets) {
 
 	var firstDate = tweet_array[0].time;
 	var lastDate = tweet_array[0].time;
+	var count_usr = 0;
 	
 
 	const count_src  = {
@@ -30,6 +31,7 @@ function parseTweets(runkeeper_tweets) {
 		if (currDate < firstDate) {firstDate = currDate;}
 		if (currDate > lastDate) {lastDate = currDate;}
 		count_src[tweet_array[i].source] += 1;
+		if (tweet_array[i].written) {count_usr += 1;}
 	}
 	/*
 	console.log(typeof firstDate);
@@ -55,7 +57,7 @@ function parseTweets(runkeeper_tweets) {
 	for (var i = 0; i < event_classes.length; ++i) {
 		const span_arr = document.querySelectorAll("." + event_classes[i]);
 		span_arr.forEach((ele) => {
-			console.log(ele.innerText);
+			//console.log(ele.innerText);
 			ele.innerText = count_src[class_to_cnt[i]];
 		});
 		const span_pct = document.querySelectorAll("." + event_classes[i] + "Pct");
@@ -63,6 +65,10 @@ function parseTweets(runkeeper_tweets) {
 			ele.innerText = math.format((100 * count_src[class_to_cnt[i]] / tweet_array.length), { notation: 'fixed', precision: 2 }) + "%";
 		});
 	}
+
+	document.querySelector(".written").innerText = count_usr;
+	document.querySelector(".writtenPct").innerText = math.format((100 * count_usr / count_src["completed_event"]), { notation: 'fixed', precision: 2 }) + "%";;
+
 }
 
 //Wait for the DOM to load

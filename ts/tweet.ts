@@ -24,9 +24,8 @@ class Tweet {
     //returns a boolean, whether the text includes any content written by the person tweeting.
     get written():boolean {
         //TODO: identify whether the tweet is written
-
-        
-        return false;
+        if (this.text.includes("@Runkeeper")) {return false;}
+        return true;
     }
 
     get writtenText():string {
@@ -34,6 +33,13 @@ class Tweet {
             return "";
         }
         //TODO: parse the written text from the tweet
+        var index_user = this.text.indexOf("-");
+        var index_http = this.text.indexOf("http");
+        if (index_user != -1 && index_http != -1) {
+            if (index_user + 2 < this.text.length) {
+                return this.text.substring(index_user + 2, index_http);
+            }
+        }
         return "";
     }
 
