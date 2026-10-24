@@ -53,21 +53,33 @@ class Tweet {
         for (var i:number = 0; i < activities.length; ++i) {
             if (this.text.includes(" " + activities[i])) {return activities[i];}
         }*/
+       var oneinquestion:string = "ha";
         var strip_index:number = -1;
         var activity_type:string = "";
-        if (this.text.includes(" km")) {strip_index = this.text.indexOf(" km")}
-        if (this.text.includes(" mi")) {strip_index = this.text.indexOf(" mi")}
+        if (this.text.includes(" km ")) {strip_index = this.text.indexOf(" km ")}
+        else if (this.text.includes(" mi ")) {strip_index = this.text.indexOf(" mi ")}
         if (strip_index != -1 && strip_index + 4 < this.text.length) {
             //console.log(this.text.substring(strip_index + 4));
             var matches = this.text.substring(strip_index + 4).match(/\w+/);
             //console.log(matches);
-            if (matches) {activity_type = matches[0];}
+            if (matches) {
+                
+                activity_type = matches[0];
+                //if (activity_type == oneinquestion) {console.log(activity_type + " phase 1: " + this.text);
+                //    console.log(matches);
+                //}
+            }
             return activity_type;
         }
         strip_index = this.text.indexOf("posted a ");
         if (strip_index != -1 && strip_index + 9 < this.text.length) {
             var matches = this.text.substring(strip_index + 9).match(/\w+/);
-            if (matches) {activity_type = matches[0];}
+            if (matches) {
+                activity_type = matches[0];
+                //if (activity_type == oneinquestion) {console.log(activity_type + "phase 2 : " + this.text);
+                //    console.log(matches);
+                //}
+            }
             return activity_type;
         }
 
@@ -82,6 +94,7 @@ class Tweet {
         var distance:number = Number(this.text.match(/\d+(\.\d+)?/)?.[0] ?? NaN);
         if (distance == -1) {return -1;}
         //console.log("extracted distance: " + distance);
+        //if (distance > 100) {console.log(this.text);}
         if (this.text.includes(" km")) {return distance / 1.609;}
         return distance;
     }

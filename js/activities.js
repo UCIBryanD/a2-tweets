@@ -18,6 +18,7 @@ function parseTweets(runkeeper_tweets) {
 		else {tweet_categories[tweet_array[i].activityType] = 1; cnt_categories += 1;}
 	}
 
+	console.log(tweet_categories);
 	const keys = Object.keys(tweet_categories);
 	var first = keys[0];
 	var second = keys[1];
@@ -82,6 +83,10 @@ function parseTweets(runkeeper_tweets) {
 	}
 	console.log(avg_time);
 
+
+
+
+	// calculate avg len of the longest activity on weekends vs weekdays
 	var weekday_ct = 0;
 	var weekend_ct = 0;
 	var weekday_len = 0;
@@ -98,8 +103,8 @@ function parseTweets(runkeeper_tweets) {
 			weekday_len += tweet_array[i].distance;
 		}
 	}
-	console.log(weekday_ct + " " + weekday_len);
-	console.log(weekend_ct + " " + weekend_len);
+	//console.log(weekday_ct + " " + weekday_len);
+	//console.log(weekend_ct + " " + weekend_len);
 	var longest_dow = "weekdays";
 	if (weekday_len / weekday_ct < weekend_len / weekend_ct) {
 		longest_dow = "weekends";
@@ -121,23 +126,165 @@ function parseTweets(runkeeper_tweets) {
 	document.getElementById('shortestActivityType').innerText = shortest_cat;
 	document.getElementById('weekdayOrWeekendLonger').innerText = longest_dow;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	//TODO: create a new array or manipulate tweet_array to create a graph of the number of tweets containing each type of activity.
+
+	var tweets_data = [];
+
+	for (var i = 0; i < tweet_array.length; ++i) {
+		for (var j = 0; j < top_act.length; ++j) {
+			if (tweet_array[i].activityType == top_act[j]) {
+				tweets_data.push(
+					{
+						category: tweet_array[i].activityType,
+						day: tweet_array[i].time,
+						distance: tweet_array[i].distance
+					}
+				);
+			}
+		}
+	}
+	
+
+
+
+	//console.log(tweets_data);
+	var activity_entries = Object.entries(tweet_categories);
+	var activity_array = activity_entries.map(function(kv_pair) {
+		return {
+			"category": kv_pair[0],
+			"count": kv_pair[1]
+		}
+	});
+	
+	
 
 	activity_vis_spec = {
 	  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
 	  "description": "A graph of the number of Tweets containing each type of activity.",
 	  "data": {
-	    "values": tweet_array
-	  }
+	    "values": activity_array
+	  },
+	  mark: "point",
+	  encoding: {
+		x: {
+			field: "category",
+			type: "nominal",
+		},
+		y: {
+			field: "count",
+			type: "quantitative"
+		},
+		color: {
+			field: "category",
+			type: "nominal"
+		}
+	  },
 	  //TODO: Add mark and encoding
 	};
 	vegaEmbed('#activityVis', activity_vis_spec, {actions:false});
 
 	//TODO: create the visualizations which group the three most-tweeted activities by the day of the week.
 	//Use those visualizations to answer the questions about which activities tended to be longest and when.
+
+	distance_vis_spec = {
+	  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	  "description": "A graph of the distance of the top 3 activities by day.",
+	  "data": {
+	    "values": tweets_data
+	  },
+	  mark: "point",
+	  encoding: {
+		x: {
+			field: "day",
+			type: "temporal",
+			timeUnit: "day",
+		},
+		y: {
+			field: "distance",
+			type: "quantitative"
+		},
+		color: {
+			field: "category",
+			type: "nominal"
+		}
+	  },
+	  //TODO: Add mark and encoding
+	};
+
+	vegaEmbed('#distanceVis', distance_vis_spec, {actions:false});
+
+	distance_vis_agg_spec = {
+	  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	  "description": "A graph of the aggregate mean distance of the top 3 activities by day.",
+	  "data": {
+	    "values": tweets_data
+	  },
+	  mark: "point",
+	  encoding: {
+		x: {
+			field: "day",
+			type: "temporal",
+			timeUnit: "day",
+		},
+		y: {
+			aggregate: "mean",
+			field: "distance",
+			type: "quantitative"
+		},
+		color: {
+			field: "category",
+			type: "nominal"
+		}
+	  },
+	  //TODO: Add mark and encoding
+	};
+
+	vegaEmbed('#distanceVisAggregated', distance_vis_agg_spec, {actions:false});
+}
+
+
+function toggle_vega() {
+	const vega_btn = document.getElementById("aggregate");
+	const distance_vis = document.getElementById("distanceVis");
+	const distance_vis_agg = document.getElementById("distanceVisAggregated");
+	
+	var show_agg = true;
+	distance_vis.hidden = false;
+	distance_vis_agg.hidden = true;
+	vega_btn.innerText = "Show means";
+
+	vega_btn.addEventListener("click", function (event) {
+		if (show_agg) {
+			vega_btn.innerText = "Show all activities";
+			show_agg = !show_agg;
+		}
+		else {
+			vega_btn.innerText = "Show means";
+			show_agg = !show_agg;
+		}
+		distance_vis.hidden = !distance_vis.hidden;
+		distance_vis_agg.hidden = !distance_vis_agg.hidden;
+	});
 }
 
 //Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', function (event) {
 	loadSavedRunkeeperTweets().then(parseTweets);
+	toggle_vega();
 });
+
