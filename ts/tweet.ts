@@ -48,7 +48,30 @@ class Tweet {
             return "unknown";
         }
         //TODO: parse the activity type from the text of the tweet
-        return "";
+        /*
+        const activities= ["run", "walk", "bike", "exercise", "workout", "swim", "yoga"]
+        for (var i:number = 0; i < activities.length; ++i) {
+            if (this.text.includes(" " + activities[i])) {return activities[i];}
+        }*/
+        var strip_index:number = -1;
+        var activity_type:string = "";
+        if (this.text.includes(" km")) {strip_index = this.text.indexOf(" km")}
+        if (this.text.includes(" mi")) {strip_index = this.text.indexOf(" mi")}
+        if (strip_index != -1 && strip_index + 4 < this.text.length) {
+            //console.log(this.text.substring(strip_index + 4));
+            var matches = this.text.substring(strip_index + 4).match(/\w+/);
+            //console.log(matches);
+            if (matches) {activity_type = matches[0];}
+            return activity_type;
+        }
+        strip_index = this.text.indexOf("posted a ");
+        if (strip_index != -1 && strip_index + 9 < this.text.length) {
+            var matches = this.text.substring(strip_index + 9).match(/\w+/);
+            if (matches) {activity_type = matches[0];}
+            return activity_type;
+        }
+
+        return "unknown";
     }
 
     get distance():number {
@@ -56,7 +79,11 @@ class Tweet {
             return 0;
         }
         //TODO: prase the distance from the text of the tweet
-        return 0;
+        var distance:number = Number(this.text.match(/\d+(\.\d+)?/)?.[0] ?? NaN);
+        if (distance == -1) {return -1;}
+        //console.log("extracted distance: " + distance);
+        if (this.text.includes(" km")) {return distance / 1.609;}
+        return distance;
     }
 
     getHTMLTableRow(rowNumber:number):string {
