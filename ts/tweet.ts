@@ -101,6 +101,32 @@ class Tweet {
 
     getHTMLTableRow(rowNumber:number):string {
         //TODO: return a table row which summarizes the tweet with a clickable link to the RunKeeper activity
-        return "<tr></tr>";
+        const row_index = "<td>" + rowNumber + "</td>"; 
+        const row_type = "<td>" + this.activityType + "</td>";
+        var row_data = "<td>";
+
+        //const parsed = this.text.split(" ");
+
+        const link_index = this.text.indexOf("https");
+        //console.log(this.text.substring(link_index));
+        const link_end_index = this.text.substring(link_index).indexOf(" ") + link_index;
+        //const link_end_index = link_index + 23;
+        /*
+        for (var i = 0; i < parsed.length; ++i) {
+            if (parsed[i].startsWith("http")) {
+                row_data += '<a href="' + parsed[i] + '">' + parsed[i] + '</a> ';
+            }
+            else {
+                row_data += parsed[i] + " ";
+            }
+        }
+        */
+        const link = this.text.substring(link_index, link_end_index);
+        row_data += this.text.substring(0, link_index) 
+            + '<a href="' + link + '">' + link + '</a>' +
+            this.text.substring(link_end_index);
+        row_data += "</td>";
+        //console.log(this.text);
+        return "<tr>" + row_index + row_type + row_data + "</tr>";
     }
 }
