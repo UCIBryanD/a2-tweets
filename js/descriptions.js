@@ -31,23 +31,27 @@ function addEventHandlerForSearch() {
 		console.log(query);
 
 		search_text.innerText = query;
+		
 		query_table.innerHTML = "";
-
-		var match_tweets = []
-		var row_num = 0;
-		for (var i = 0; i < user_array.length; ++i) {
-			if (user_array[i].text.toLowerCase().includes(query.toLowerCase())) {
-				//match_tweets.push(user_array[i]);
-				row_num += 1;
-				query_table.innerHTML += user_array[i].getHTMLTableRow(row_num);
+		search_count.innerText = 0;
+		if (query != "") {
+			var match_tweets = []
+			var row_num = 0;
+			for (var i = 0; i < user_array.length; ++i) {
+				if (user_array[i].text.toLowerCase().includes(query.toLowerCase())) {
+					//match_tweets.push(user_array[i]);
+					row_num += 1;
+					query_table.insertAdjacentHTML("beforeend", user_array[i].getHTMLTableRow(row_num));
+					console.log("pass");
+				}
 			}
-		}
 
-		search_count.innerText = row_num;
-		//console.log(user_array);
-		//for (var i = 0; i < match_tweets.length; ++i) {
-		//	query_table.innerHTML += match_tweets[i].getHTMLTableRow(i + 1);
-		//}
+			search_count.innerText = row_num;
+			//console.log(user_array);
+			//for (var i = 0; i < match_tweets.length; ++i) {
+			//	query_table.innerHTML += match_tweets[i].getHTMLTableRow(i + 1);
+			//}
+		}
 	});
 }
 
